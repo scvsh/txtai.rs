@@ -1,32 +1,30 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::error::Error;
 use std::fmt;
 
 pub use crate::api::API;
 
 /// Extractor definition
 pub struct Extractor {
-    api: API
+    api: API,
 }
 
 /// Extractor implementation
 impl Extractor {
     /// Creates an Extractor instance.
-    /// 
+    ///
     /// # Arguments
     /// * `url` - base url of txtai API
     pub fn new(url: &str) -> Extractor {
-        Extractor {
-            api: API::new(url)
-        }
+        Extractor { api: API::new(url) }
     }
 
-     /// Extracts answers to input questions.
-     /// 
-     /// # Arguments
-     /// * `queue` -  list of {name: value, query: value, question: value, snippet: value}
-     /// * `texts` - list of texts
+    /// Extracts answers to input questions.
+    ///
+    /// # Arguments
+    /// * `queue` -  list of {name: value, query: value, question: value, snippet: value}
+    /// * `texts` - list of texts
     pub async fn extract(&self, queue: &Vec<Question>, texts: &Vec<&str>) -> Answers {
         // Post parameters
         let params = json!({"queue": queue, "texts": texts});
@@ -37,7 +35,7 @@ impl Extractor {
 }
 
 // Extractor return types
-pub type Answers = Result<Vec<Answer>, Box<dyn Error>>;
+pub type Answers = Result<Vec<Answer>>;
 
 /// Input Question
 #[derive(Debug, Serialize)]
@@ -45,14 +43,14 @@ pub struct Question {
     pub name: String,
     pub query: String,
     pub question: String,
-    pub snippet: bool
+    pub snippet: bool,
 }
 
 /// Answer response
 #[derive(Debug, Deserialize)]
 pub struct Answer {
     pub name: String,
-    pub answer: String
+    pub answer: String,
 }
 
 impl fmt::Display for Answer {

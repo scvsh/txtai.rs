@@ -1,5 +1,5 @@
+use anyhow::Result;
 use std::env;
-use std::error::Error;
 
 mod embeddings;
 mod extractor;
@@ -12,21 +12,20 @@ use labels::labels;
 use pipelines::pipelines;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() <= 1 {
-        println!("Usage: {} (default)embeddings|extractor|labels|pipelines", args[0])
-    }
-    else if args[1] == "extractor" {
+        println!(
+            "Usage: {} (default)embeddings|extractor|labels|pipelines",
+            args[0]
+        )
+    } else if args[1] == "extractor" {
         extractor().await?;
-    }
-    else if args[1] == "labels" {
+    } else if args[1] == "labels" {
         labels().await?;
-    }
-    else if args[1] == "pipelines" {
+    } else if args[1] == "pipelines" {
         pipelines().await?;
-    }
-    else {
+    } else {
         embeddings().await?;
     }
 

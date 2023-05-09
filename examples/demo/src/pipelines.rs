@@ -1,4 +1,4 @@
-use std::error::Error;
+use anyhow::Result;
 
 use txtai::segmentation::Segmentation;
 use txtai::summary::Summary;
@@ -8,9 +8,9 @@ use txtai::translation::Translation;
 use txtai::workflow::Workflow;
 
 /// Example pipeline and workflow functionality.
-/// 
+///
 /// Uses files from txtai unit tests: https://github.com/neuml/txtai/releases/download/v2.0.0/tests.tar.gz
-pub async fn pipelines() -> Result<(), Box<dyn Error>> {
+pub async fn pipelines() -> Result<()> {
     let service = "http://localhost:8000";
 
     let segment = Segmentation::new(service);
@@ -27,7 +27,9 @@ pub async fn pipelines() -> Result<(), Box<dyn Error>> {
     println!("{:?}", text);
 
     let summary = Summary::new(service);
-    let summarytext = summary.summary(text.as_string().unwrap(), None, None).await?;
+    let summarytext = summary
+        .summary(text.as_string().unwrap(), None, None)
+        .await?;
 
     println!("\n---- Summary Text ----");
     println!("{:?}", summarytext);
@@ -39,13 +41,17 @@ pub async fn pipelines() -> Result<(), Box<dyn Error>> {
     println!("{:?}", translation);
 
     let workflow = Workflow::new(service);
-    let output = workflow.workflow("sumspanish", &vec!["file:///tmp/txtai/article.pdf"]).await?;
+    let output = workflow
+        .workflow("sumspanish", &vec!["file:///tmp/txtai/article.pdf"])
+        .await?;
 
     println!("\n---- Workflow [Extract Text->Summarize->Translate] ----");
     println!("{:?}", output);
 
     let transcribe = Transcription::new(service);
-    let transcription = transcribe.transcribe("/tmp/txtai/Make_huge_profits.wav").await?;
+    let transcription = transcribe
+        .transcribe("/tmp/txtai/Make_huge_profits.wav")
+        .await?;
 
     println!("\n---- Transcribed Text ----");
     println!("{:?}", transcription);

@@ -1,12 +1,12 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::error::Error;
 
-pub use crate::api::{API, APIResponse, IndexResults, IndexResultsBatch};
+pub use crate::api::{APIResponse, IndexResults, IndexResultsBatch, API};
 
 /// Embeddings definition
 pub struct Embeddings {
-    api: API
+    api: API,
 }
 
 /// Embeddings implementation
@@ -16,14 +16,12 @@ impl Embeddings {
     /// # Arguments
     /// * `url` - base url of txtai API
     pub fn new(url: &str) -> Embeddings {
-        Embeddings {
-            api: API::new(url)
-        }
+        Embeddings { api: API::new(url) }
     }
 
     /// Runs an Embeddings search. Returns Response. This method allows
     /// callers to customize the serialization of the response.
-    /// 
+    ///
     /// # Arguments
     /// * `query` - query text
     /// * `limit` - maximum results
@@ -38,7 +36,7 @@ impl Embeddings {
     /// Finds documents in the embeddings model most similar to the input query. Returns
     /// a list of {id: value, score: value} sorted by highest score, where id is the
     /// document id in the embeddings model.
-    /// 
+    ///
     /// # Arguments
     /// * `query` - query text
     /// * `limit` - maximum results
@@ -63,7 +61,7 @@ impl Embeddings {
     }
 
     /// Adds a batch of documents for indexing.
-    /// 
+    ///
     /// # Arguments
     /// * `documents` - list of {id: value, text: value}
     pub async fn add<T: Serialize>(&self, documents: &Vec<T>) -> APIResponse {
@@ -83,10 +81,10 @@ impl Embeddings {
         Ok(self.api.get("upsert", &[]).await?)
     }
 
-     /// Deletes from an embeddings index. Returns list of ids deleted.
-     ///
-     /// # Arguments
-     /// * `ids` - list of ids to delete
+    /// Deletes from an embeddings index. Returns list of ids deleted.
+    ///
+    /// # Arguments
+    /// * `ids` - list of ids to delete
     pub async fn delete(&self, ids: &Vec<&str>) -> Ids {
         // Execute API call
         Ok(self.api.post("delete", &json!(ids)).await?.json().await?)
@@ -119,16 +117,25 @@ impl Embeddings {
     /// # Arguments
     /// * `queries` - queries text
     /// * `texts` - list of text
-    pub async fn batchsimilarity(&self, queries: &Vec<&str>, texts: &Vec<&str>) -> IndexResultsBatch {
+    pub async fn batchsimilarity(
+        &self,
+        queries: &Vec<&str>,
+        texts: &Vec<&str>,
+    ) -> IndexResultsBatch {
         // Post parameters
         let params = json!({"queries": queries, "texts": texts});
 
         // Execute API call
-        Ok(self.api.post("batchsimilarity", &params).await?.json().await?)
+        Ok(self
+            .api
+            .post("batchsimilarity", &params)
+            .await?
+            .json()
+            .await?)
     }
 
     /// Transforms text into an embeddings array.
-    /// 
+    ///
     /// # Arguments
     /// * `text` - input text
     pub async fn transform(&self, text: &str) -> Embedding {
@@ -145,28 +152,33 @@ impl Embeddings {
     /// * `texts` - lists of text
     pub async fn batchtransform(&self, texts: &str) -> EmbeddingBatch {
         // Execute API call
-        Ok(self.api.post("batchtransform", &json!(texts)).await?.json().await?)
+        Ok(self
+            .api
+            .post("batchtransform", &json!(texts))
+            .await?
+            .json()
+            .await?)
     }
 }
 
 // Embeddings return types
-pub type Embedding = Result<Vec<f32>, Box<dyn Error>>;
-pub type EmbeddingBatch = Result<Vec<Vec<f32>>, Box<dyn Error>>;
-pub type Ids = Result<Vec<String>, Box<dyn Error>>;
-pub type Count = Result<usize, Box<dyn Error>>;
-pub type SearchResults = Result<Vec<SearchResult>, Box<dyn Error>>;
-pub type SearchResultsBatch = Result<Vec<Vec<SearchResult>>, Box<dyn Error>>;
+pub type Embedding = Result<Vec<f32>>;
+pub type EmbeddingBatch = Result<Vec<Vec<f32>>>;
+pub type Ids = Result<Vec<String>>;
+pub type Count = Result<usize>;
+pub type SearchResults = Result<Vec<SearchResult>>;
+pub type SearchResultsBatch = Result<Vec<Vec<SearchResult>>>;
 
 /// Input document
 #[derive(Debug, Serialize)]
 pub struct Document {
     pub id: String,
-    pub text: String
+    pub text: String,
 }
 
 // Search result
 #[derive(Debug, Deserialize)]
 pub struct SearchResult {
     pub id: String,
-    pub score: f32
+    pub score: f32,
 }
