@@ -30,7 +30,7 @@ impl Embeddings {
         let params = [("query", query), ("limit", &limit.to_string())];
 
         // Execute API call
-        Ok(self.api.get("search", &params).await?)
+        self.api.get("search", &params).await
     }
 
     /// Finds documents in the embeddings model most similar to the input query. Returns
@@ -66,19 +66,19 @@ impl Embeddings {
     /// * `documents` - list of {id: value, text: value}
     pub async fn add<T: Serialize>(&self, documents: &Vec<T>) -> APIResponse {
         // Execute API call
-        Ok(self.api.post("add", &json!(documents)).await?)
+        self.api.post("add", &json!(documents)).await
     }
 
     /// Builds an embeddings index for previously batched documents.
     pub async fn index(&self) -> APIResponse {
         // Execute API call
-        Ok(self.api.get("index", &[]).await?)
+        self.api.get("index", &[]).await
     }
 
     /// Runs an embeddings upsert operation for previously batched documents.
     pub async fn upsert(&self) -> APIResponse {
         // Execute API call
-        Ok(self.api.get("upsert", &[]).await?)
+        self.api.get("upsert", &[]).await
     }
 
     /// Deletes from an embeddings index. Returns list of ids deleted.

@@ -32,11 +32,11 @@ impl Translation {
         let tgt = target.unwrap_or("");
         let src = source.unwrap_or("");
 
-        if tgt != "" {
-            params.push(("target", &tgt));
+        if !tgt.is_empty() {
+            params.push(("target", tgt));
         }
-        if src != "" {
-            params.push(("source", &src));
+        if !src.is_empty() {
+            params.push(("source", src));
         }
 
         // Execute API call
